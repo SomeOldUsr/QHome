@@ -1,9 +1,9 @@
 from PyQt5 import QtWidgets, uic, QtCore
 from datetime import datetime
 import sys
-import OpenGL.GL as gl
-import OpenGL.GLU as glu
-import OpenGL.GLUT as glut
+# import OpenGL.GL as gl
+# import OpenGL.GLU as glu
+# import OpenGL.GLUT as glut
 
 
 class KlingelWindow(QtWidgets.QMainWindow):
@@ -24,26 +24,71 @@ class KlingelWindow(QtWidgets.QMainWindow):
 
         # creating additional objects
         self.timer = QtCore.QTimer(self)
-        self.next_minute()
 
         # adding events
         self.durchsageButton.clicked.connect(self.durchsage_click)
         self.tuerButton.clicked.connect(self.tuer_click)
         self.timer.timeout.connect(self.next_minute)
 
-        # start timer at 0 microseconds
-        # should be in a thread to avoid the one second start time
-        while datetime.now().microsecond != 0:
-            pass
-        self.timer.start(1000)
+        self._setup()
 
-        # show window
-        # self.setupUI()
+    ##########
+    # EVENTS
+    ##########
+
+    # Button
+    def durchsage_click(self):
+        """
+        click event for durchsageButton
+        :return:
+        """
+        QtWidgets.QMessageBox(text=self.sender().text()).exec()
+
+    def tuer_click(self):
+        """
+        click event for tuerButton
+        :return:
+        """
+        QtWidgets.QMessageBox(text=self.sender().text()).exec()
+
+    # Timer
+    def next_minute(self):
+        """
+        timeout event for timer object
+        increments minute
+        :return:
+        """
+        self.lcdNumber.display(datetime.now().strftime('%H:%M'))
+
+    ###########
+    # HELPER
+    ###########
+
+    # init
+    def _setup(self):
+        self._init_timer()
+
         self.show()
+
+    def _init_timer(self):
+        """
+        initializes the timer once a time with 0.000 seconds is reached,
+        in order for the clock to be synchronized
+        """
+        self.next_minute()
+        milliseconds = 1000 - datetime.now().microsecond // 1000
+        seconds = 60 - datetime.now().second
+        QtCore.QTimer.singleShot(seconds * 1000 + milliseconds, lambda: (self.next_minute(), self.timer.start(60_000)))
+
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    window = KlingelWindow('UI/Klingel.ui')
+    app.exec()
 
     '''
     I Don't know what any of this does
-    
+
     def setupUI(self):
         print("\033[1;101m SETU6P UI \033[0m")
         self.windowsHeight = self.openGLWidget.height()
@@ -81,30 +126,3 @@ class KlingelWindow(QtWidgets.QMainWindow):
 
         glu.gluLookAt(12, 12, 12, 0, 0, 0, 0, 1, 0)
     '''
-
-    def next_minute(self):
-        """
-        increments minute
-        :return:
-        """
-        self.lcdNumber.display(datetime.now().strftime('%H:%M'))
-
-    def durchsage_click(self):
-        """
-        macht durchsage
-        :return:
-        """
-        QtWidgets.QMessageBox(text=self.sender().text()).exec()
-
-    def tuer_click(self):
-        """
-        öffnet Tür
-        :return:
-        """
-        QtWidgets.QMessageBox(text=self.sender().text()).exec()
-
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    window = KlingelWindow('UI/Klingel.ui')
-    app.exec()
