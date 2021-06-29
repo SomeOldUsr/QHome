@@ -144,7 +144,7 @@
      <attribute name="title">
       <string>Kamera</string>
      </attribute>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="durchsageButton">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -157,7 +157,7 @@
        <string>Durchsage</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="tuerButton">
       <property name="geometry">
        <rect>
         <x>160</x>
